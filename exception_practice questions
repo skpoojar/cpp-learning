@@ -1,0 +1,121 @@
+Exercise 1 — RAII for File Handling
+
+Problem:
+Write a class FileRAII that opens a file in its constructor and closes it in the destructor. Throw an exception if the file cannot be opened.
+
+#include <fstream>
+#include <string>
+
+class FileRAII {
+    std::ifstream file;
+public:
+    FileRAII(const std::string& filename); // open file
+    ~FileRAII();                            // close file automatically
+    void readLine();                        // read a line
+};
+
+Tasks:
+
+Implement constructor to open the file.
+Throw std::runtime_error if file cannot be opened.
+Implement destructor to close the file automatically.
+Write main() to test stack unwinding by throwing an exception after opening the file.
+
+Hint:
+
+Use file.is_open() to check if the file opened successfully.
+Ensure destructor never throws.
+Exercise 2 — Custom Smart Pointer
+
+Problem:
+Create a simple smart pointer class SimplePtr<T> that manages a dynamically allocated object and deletes it automatically.
+
+template <typename T>
+class SimplePtr {
+    T* ptr;
+public:
+    explicit SimplePtr(T* p = nullptr); // constructor
+    ~SimplePtr();                        // destructor deletes ptr
+    T& operator*();                      // dereference operator
+    T* operator->();                     // arrow operator
+};
+
+Tasks:
+
+Implement constructor to store pointer.
+Implement destructor to free memory.
+Implement dereference and arrow operators.
+Test exception safety by throwing an exception after creating a SimplePtr object — memory should be freed automatically.
+
+Hint:
+
+Use delete ptr in destructor.
+Stack unwinding ensures proper cleanup.
+Exercise 3 — Exception Safety Guarantee
+
+Problem:
+Implement a function addElementSafe(std::vector<int>& v, int x) that provides strong exception safety: either the element is added or the vector remains unchanged if an exception occurs.
+
+#include <vector>
+
+void addElementSafe(std::vector<int>& v, int x);
+
+Tasks:
+
+Use a temporary vector to perform the operation.
+Commit changes only after the operation succeeds.
+Throw an exception artificially to test strong guarantee.
+
+Hint:
+
+Copy vector → modify → assign back.
+Exercise 4 — Virtual Destructor
+
+Problem:
+Create a base class Shape and derived class Circle. Use dynamic allocation. Ensure deleting a Shape* pointing to a Circle calls both destructors.
+
+class Shape {
+public:
+    virtual ~Shape(); // make virtual
+};
+
+class Circle : public Shape {
+public:
+    ~Circle();
+};
+
+Tasks:
+
+Print a message in each destructor.
+Allocate Shape* s = new Circle();
+Delete s and check output.
+
+Expected Behavior:
+
+Circle destructor runs first
+Then Shape destructor
+
+Hint:
+
+Without virtual, only base destructor runs → resource leak.
+Exercise 5 — Mutex + RAII (Thread Safety)
+
+Problem:
+Write a function that updates a shared integer using a std::mutex and ensures the mutex is released even if an exception occurs.
+
+#include <mutex>
+
+std::mutex m;
+int sharedValue = 0;
+
+void safeUpdate(int x);
+
+Tasks:
+
+Use std::lock_guard<std::mutex> to manage mutex.
+Throw an exception artificially after locking.
+Ensure mutex is released automatically.
+
+Hint:
+
+RAII with lock_guard guarantees unlock on stack unwinding.
